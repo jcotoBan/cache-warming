@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: crawler
+  name: crawler
+  namespace: prerender-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: crawler
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: crawler
+    spec:
+      containers:
+      - image: koton00beng/crawler:v1.1
+        name: crawler
+        ports:
+        - containerPort: 5005
+        env:
+        - name: CRAWLER_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: crawlercreds
+              key: user
+        - name: CRAWLER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: crawlercreds
+              key: pass
+        - name: JWT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: crawlercreds
+              key: token
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: crawler
+  name: crawler
+  namespace: prerender-ns
+spec:
+  ports:
+  - port: 5005
+    protocol: TCP
+    targetPort: 5005
+    name: crawler
+  selector:
+    app: crawler
+
