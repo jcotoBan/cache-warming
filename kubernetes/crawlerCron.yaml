@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: crawlercron
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: crawlercont
+            image: koton00beng/cjcrawler:v1.3
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: REDIS_HOST
+              value: "tredis-master.redis.svc.cluster.local"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PRE_URL
+              value: "http://prerender.prerender-ns.svc.cluster.local:8080"
+            - name: PRE_CREDS
+              value: "admin123:jcotoadmin"
+            - name: SITEMAP_URL
+              value: "https://jucot.akamaidemos.com/sitemap.xml"
+          restartPolicy: OnFailure
